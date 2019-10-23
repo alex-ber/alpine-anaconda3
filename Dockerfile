@@ -119,7 +119,8 @@ RUN set -ex && \
     ln -s /opt/anaconda3/bin/python3.7 /usr/bin/python3.7 && \
     ln -s /opt/anaconda3/bin/pip /usr/bin/pip && \
     ln -s /opt/anaconda3/bin/pip3 /usr/bin/pip3 && \
-    ln -s /opt/anaconda3/bin/pip3.7 /usr/bin/pip3.7
+    ln -s /opt/anaconda3/bin/pip3.7 /usr/bin/pip3.7 && \
+    ln -s /opt/anaconda3/bin/conda /opt/anaconda3/bin/conda3
 
 
 
@@ -141,6 +142,6 @@ CMD ["/bin/sh"]
 #smoke test
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.1
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.2
 #docker push alexberkovich/alpine-anaconda3
 # EOF
