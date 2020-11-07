@@ -13,20 +13,31 @@ ARG GLIBC_VERSION=2.32-r0
 ARG ANACONDA_VERSION=Anaconda3-2020.07
 
 
-#updating from alpine 3.8 to 3.12 as of 01.11.2020
+
+#updating from alpine 3.8 to 3.12 as of 05.11.2020
 RUN set -ex && \
     #apk -U upgrade  && \
     apk add --no-cache musl=1.1.24-r9 busybox=1.31.1-r19 alpine-baselayout=3.2.0-r7 ca-certificates-bundle \
                        ssl_client=1.31.1-r19 musl-utils=1.1.24-r9
 
-#bash+usefull utils
-#curl is installed below
+#dbus-launch, dbus-run-session
 RUN set -ex && \
-    apk --no-cache add bash=5.0.17-r0 nano=4.9.3-r0 mlocate=0.26-r7 && \
-    updatedb
+    apk add --no-cache dbus=1.12.18-r0 dbus-x11=1.12.18-r0 libx11=1.6.12-r0 libxcb=1.14-r1 libxdmcp=1.1.3-r0 \
+                           libxcb=1.14-r1 libx11=1.6.12-r0
 
-#disable coloring for nano, see https://stackoverflow.com/a/55597765/1137529
-RUN echo "syntax \"disabled\" \".\"" > ~/.nanorc; echo "color green \"^$\"" >> ~/.nanorc
+#libgnome-keyring
+RUN set -ex && \
+   apk add --no-cache libgnome-keyring=3.12.0-r2 dbus-libs=1.12.18-r0 gnome-keyring=3.36.0-r0 \
+           linux-pam=1.3.1-r4 gcr-base=3.36.0-r0 p11-kit=0.23.20-r5 glib=2.64.6-r0 pcre=8.44-r0 \
+           libmount=2.35.2-r0 libblkid=2.35.2-r0 libintl=0.20.2-r0 libcap-ng=0.7.10-r1
+
+#Git
+RUN set -ex && \
+   apk add --no-cache git=2.26.2-r0 expat=2.2.9-r1 pcre2=10.35-r0 && \
+   #git config --global credential.helper store
+   git config --global credential.helper cache
+
+
 
 #ssl, curl
 #for curl-dev see https://stackoverflow.com/a/51849028/1137529
@@ -64,6 +75,14 @@ RUN set -ex && \
     ( /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true ) && \
     echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
     /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
+
+#bash+usefull utils
+#curl is installed above
+RUN set -ex && \
+    apk --no-cache add bash=5.0.17-r0 nano=4.9.3-r0 mlocate=0.26-r7 && \
+    updatedb && \
+    #disable coloring for nano, see https://stackoverflow.com/a/55597765/1137529
+    echo "syntax \"disabled\" \".\"" > ~/.nanorc; echo "color green \"^$\"" >> ~/.nanorc
 
 
 #https://stackoverflow.com/questions/9510474/removing-pips-cache
@@ -122,7 +141,12 @@ RUN set -ex && \
      pip install graphviz==0.14.2 numpy==1.16.2 scipy==1.2.1 && \
 
      #reinstall removed package by conda uninstall through pip (pinned versions)
-     pip install pandas==0.25.3 scikit-learn==0.20.3  matplotlib==3.0.3 shub==2.10.0 nltk==3.4.5 \
+     #we have scikit-learn==0.20.3 and joblib inside scikit-learn=
+     #see https://github.com/scikit-learn/scikit-learn/issues/15800
+     #https://stackoverflow.com/questions/58700384/how-to-fix-typeerror-an-integer-is-required-got-type-bytes-error-when-tryin
+     #https://github.com/apache/spark/blob/v2.4.5/python/pyspark/cloudpickle.py#L78-L93 (patch)
+     ##PySpark https://issues.apache.org/jira/browse/SPARK-29536
+     pip install pandas==0.25.3 scikit-learn==0.22 joblib==0.14.1 matplotlib==3.0.3 shub==2.10.0 nltk==3.4.5 \
                  seaborn==0.9.0 Bottleneck==1.2.1 && \
 
      #reinstall removed package by conda uninstall through pip (latest versions)
@@ -131,16 +155,41 @@ RUN set -ex && \
      #" For production systems you should pin the version being used with ruamel.yaml<=0.15",
 	 #see https://pypi.org/project/ruamel.yaml/ On 0.15.78  setup issue for 3.8 was fixed.
      pip install  \
-                 lxml==4.6.1 beautifulsoup4==4.9.3 pyodbc==4.0.30 mock==4.0.2 pytest==6.1.1 flask==1.1.2 \
+                 lxml==4.6.1 beautifulsoup4==4.9.3 pyodbc==4.0.30 mock==4.0.2 pytest==6.1.2 flask==1.1.2 \
                  HiYaPyCo==0.4.16 terminado==0.9.1 nbconvert==6.0.7 keyring==21.4.0 \
                  PyWavelets==1.1.1 pytest-doctestplus==0.2.0 pytest-arraydiff==0.3 patsy==0.5.1 \
                  numexpr==2.7.1 imageio==2.9.0 h5py==2.10.0 bkcharts==0.2 astropy==4.1 Pillow==8.0.1 \
                  Werkzeug==1.0.1
 
-
+#extras
 RUN set -ex && \
 	 #boto3
-	 pip install awscli==1.18.54 boto3==1.13.4 botocore==1.16.4 colorama==0.4.1
+	 pip install awscli==1.18.54 boto3==1.13.4 botocore==1.16.4 colorama==0.4.3 && \
+	 pip install python-dotenv==0.15.0 && \
+	 pip install bidict==0.21.2 && \
+
+	 #fabric
+	 pip install fabric==2.5.0 invoke==1.4.1 paramiko==2.7.2 PyNaCl==1.3.0  bcrypt==3.2.0 \
+	             cffi==1.14.3 cryptography==3.1.1 pycparser==2.20 PyNaCl==1.3.0 six==1.15.0 && \
+
+	 #pytest extra
+	 pip install pytest==6.1.2 mock==4.0.2 pytest-assume==2.3.3 pytest-mock==3.3.1 \
+	             attrs==20.2.0 py==1.9.0 PyYAML==5.1 toml==0.10.2 pluggy==0.13.1 packaging==20.4 iniconfig==1.1.1 \
+	             pyparsing==2.4.7  && \
+
+	 #twine
+     #https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
+     #Add Python 3.8 support
+     #see https://github.com/pypa/twine/pull/518
+     pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
+                                                                          requests-toolbelt==0.9.1  && \
+     #SQLAlchemy & Hive
+	 pip install SQLAlchemy==1.3.3 thrift==0.13.0 thrift-sasl==0.4.2 sasl==0.2.1 PyHive==0.6.2
+
+
+
+#nltk-data
+#RUN set -ex && python -m nltk.downloader -d /usr/share/nltk_data all
 
 
 RUN set -ex && \
@@ -179,6 +228,13 @@ RUN set -ex && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 #RUN apk del glibc-i18n make gcc musl-dev build-base gfortran
 RUN rm -rf /var/cache/apk/*
 
+
+COPY enter_keyring.sh /etc/enter_keyring.sh
+COPY reuse_keyring.sh /etc/reuse_keyring.sh
+COPY unlock_keyring.sh /etc/unlock_keyring.sh
+COPY rest_keyring.sh /etc/rest_keyring.sh
+
+
 WORKDIR /
 #CMD ["/bin/sh"]
 CMD tail -f /dev/null
@@ -193,6 +249,6 @@ CMD tail -f /dev/null
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
 #docker build --squash . -t alpine-anaconda3
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.3
-#docker push alexberkovich/alpine-anaconda3:0.0.3
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.4
+#docker push alexberkovich/alpine-anaconda3:0.0.4
 # EOF
