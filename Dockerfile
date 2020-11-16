@@ -228,7 +228,6 @@ RUN set -ex && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 #RUN apk del glibc-i18n make gcc musl-dev build-base gfortran
 RUN rm -rf /var/cache/apk/*
 
-
 COPY enter_keyring.sh /etc/enter_keyring.sh
 COPY reuse_keyring.sh /etc/reuse_keyring.sh
 COPY unlock_keyring.sh /etc/unlock_keyring.sh
@@ -249,6 +248,6 @@ CMD tail -f /dev/null
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
 #docker build --squash . -t alpine-anaconda3
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.4
-#docker push alexberkovich/alpine-anaconda3:0.0.4
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.5
+#docker push alexberkovich/alpine-anaconda3:0.0.5
 # EOF

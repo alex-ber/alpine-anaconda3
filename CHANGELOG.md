@@ -1,7 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.4] - 2020-11-08
+## [0.0.5] - 2020-11-16
+### Changed
+- Version number in this file and last tag. It should be 0.0.x and not 0.x.
+- Added support for /etc/enter_init.sh where you can provide hooks for initilializing keyring,
+like this:
+
+```bash
+#!/usr/bin/env bash
+
+set -e
+
+echo '1234' | keyring set system username
+```
+
+## [0.0.4] - 2020-11-08
 ### Added
 - `libgnome-keyring` for secure storing credentials.
 For more details, read https://medium.com/@alex-ber/using-gnome-keyring-in-docker-container-2c8a56a894f7
@@ -73,7 +87,7 @@ PySpark https://issues.apache.org/jira/browse/SPARK-29536
 For nltk_data see https://github.com/alex-ber/alpine-anaconda3/issues/2
  
 
-## [0.3] - 2020-11-01
+## [0.0.3] - 2020-11-01
 ### Changed
 - Upgrading to Alipne Linux 3.12.
 - Upgrading to bash 5
@@ -122,12 +136,12 @@ So, we're using last version in 0.x branch.
 
 
 
-## [0.2] - 2019-10-23
+## [0.0.2] - 2019-10-23
 ### Changed
 - Added soft-link to conda3.
 
 
-## [0.1] - 2019-10-17
+## [0.0.1] - 2019-10-17
 ### Changed
 - Initial release with anaconda3.
  
