@@ -248,6 +248,15 @@ CMD tail -f /dev/null
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
 #docker build --squash . -t alpine-anaconda3
+
+#see https://github.com/fabioz/PyDev.Debugger
+#docker run --env-file .env.docker --name conda3 -p 54717:54717/tcp -v //C/dev/work/:/opt/project -v //C/Program\ Files/JetBrains/PyCharm\ 2020.1.4/plugins/python/helpers:/opt/.pycharm_helpers -d alpine-anaconda3
+##docker exec -it $(docker ps -q -n=1) dbus-run-session bash
+#python /opt/.pycharm_helpers/pydev/pydevconsole.py --mode=server --port=54717 #run
+#python -u /opt/.pycharm_helpers/pydev/pydevd.py --cmd-line --multiprocess --qt-support=auto --port 54717 --file /opt/project/alpine-anaconda3/keyring_check.py #debug
+#runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
+
+
 #docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.5
 #docker push alexberkovich/alpine-anaconda3:0.0.5
 # EOF

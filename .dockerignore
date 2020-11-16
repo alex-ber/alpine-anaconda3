@@ -1,0 +1,8 @@
+.eggs
+.pytest_cache
+.idea
+build
+dist
+logs
+venv
+*.egg-info

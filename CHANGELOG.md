@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+- Some remarks was added.
+- https://medium.com/@alex-ber/using-gnome-keyring-in-docker-container-2c8a56a894f7	Using GNOME Keyring in Docker Container
+
 ## [0.0.5] - 2020-11-16
 ### Changed
 - Version number in this file and last tag. It should be 0.0.x and not 0.x.
