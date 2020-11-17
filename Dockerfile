@@ -35,7 +35,9 @@ RUN set -ex && \
 RUN set -ex && \
    apk add --no-cache git=2.26.2-r0 expat=2.2.9-r1 pcre2=10.35-r0 && \
    #git config --global credential.helper store
-   git config --global credential.helper cache
+   #git config --global credential.helper cache
+   #see https://git-scm.com/docs/git-credential-cache
+   git config --global credential.helper 'cache --timeout=3600'
 
 
 
@@ -257,6 +259,6 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.0.5
-#docker push alexberkovich/alpine-anaconda3:0.0.5
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.0
+#docker push alexberkovich/alpine-anaconda3:0.1.0
 # EOF

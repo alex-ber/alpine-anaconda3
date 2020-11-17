@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 - Some remarks was added.
 - https://medium.com/@alex-ber/using-gnome-keyring-in-docker-container-2c8a56a894f7	Using GNOME Keyring in Docker Container
 
+
+## [0.1.0] - 2020-11-17
+### Changed
+#### Fixing potential security risk.
+- Change Git not to store credential as plain text, but to keep them in memory for 1 hour
+ see https://git-scm.com/docs/git-credential-cache
+ 
+`git config --global credential.helper 'cache --timeout=3600'`
+
 ## [0.0.5] - 2020-11-16
 ### Changed
 - Version number in this file and last tag. It should be 0.0.x and not 0.x.
