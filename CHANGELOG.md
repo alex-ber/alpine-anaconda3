@@ -26,7 +26,6 @@ All notable changes to this project will be documented in this file.
 - Dockerfile-slim - for alexberkovich/alpine-anaconda3:0.1.1-slim.
  
 
-
 ## [0.1.0] - 2020-11-17
 ### Changed
 #### Fixing potential security risk.
