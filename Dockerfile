@@ -4,21 +4,16 @@ FROM alpine:3.12
 # This hack is widely applied to avoid python printing issues in docker containers.
 # See: https://github.com/Docker-Hub-frolvlad/docker-alpine-python3/pull/13
 ENV PYTHONUNBUFFERED=1
-
-ENV PATH=${PATH}:/opt/anaconda3/bin \
-    LANG=C.UTF-8
+ENV LANG=C.UTF-8
 
 ARG GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
 ARG GLIBC_VERSION=2.32-r0
-ARG ANACONDA_VERSION=Anaconda3-2020.07
 
-
-
-#updating from alpine 3.8 to 3.12 as of 05.11.2020
+#updating from alpine 3.8 to 3.12 as of 09.12.2020
 RUN set -ex && \
     #apk -U upgrade  && \
-    apk add --no-cache musl=1.1.24-r9 busybox=1.31.1-r19 alpine-baselayout=3.2.0-r7 ca-certificates-bundle \
-                       ssl_client=1.31.1-r19 musl-utils=1.1.24-r9
+    apk add --no-cache musl=1.1.24-r10 busybox=1.31.1-r19 alpine-baselayout=3.2.0-r7 ca-certificates-bundle \
+                       ssl_client=1.31.1-r19 musl-utils=1.1.24-r10
 
 #dbus-launch, dbus-run-session
 RUN set -ex && \
@@ -45,8 +40,8 @@ RUN set -ex && \
 #for curl-dev see https://stackoverflow.com/a/51849028/1137529
 #for libffi-dev see https://stackoverflow.com/a/58396708/1137529
 RUN set -ex && \
-    apk add --no-cache openssl-dev=1.1.1g-r0 musl-dev=1.1.24-r9 cyrus-sasl-dev=2.1.27-r6 \
-                       linux-headers=5.4.5-r1 unixodbc-dev=2.3.7-r2 curl-dev=7.69.1-r1 libffi-dev==3.3-r2
+    apk add --no-cache openssl-dev=1.1.1g-r0 musl-dev=1.1.24-r10 cyrus-sasl-dev=2.1.27-r6 \
+                       linux-headers=5.4.5-r1 unixodbc-dev=2.3.7-r2 curl-dev=7.69.1-r3 libffi-dev==3.3-r2
 
 #https://stackoverflow.com/questions/5178416/libxml-install-error-using-pip
 RUN set -ex && \
@@ -65,7 +60,7 @@ RUN set -ex && \
     #Remarked by Alex \
     #apk -U upgrade && \
     #Alex added --no-cache
-    apk --no-cache add libstdc++=9.3.0-r2 curl=7.69.1-r1 && \
+    apk --no-cache add libstdc++=9.3.0-r2 curl=7.69.1-r3 && \
     #Added  by Alex \
     #Alex added --no-cache
     apk --no-cache add net-tools=1.60_git20140218-r2 && \
@@ -93,6 +88,43 @@ RUN set -ex && \
 #https://stackoverflow.com/questions/9510474/removing-pips-cache/61762308#61762308
 RUN mkdir -p /root/.config/pip
 RUN echo "[global]" > /root/.config/pip/pip.conf; echo "no-cache-dir = false" >> /root/.config/pip/pip.conf; echo >> /root/.config/pip/pip.conf;
+
+##python3-dev (we need C++ header for cffi)
+#RUN set -ex && \
+#   apk add --no-cache make==4.3-r0 python3-dev==3.8.5-r0 py3-pip==20.1.1-r0
+#
+#RUN set -ex && \
+#   pip install --upgrade pip==20.3.1 setuptools==51.0.0 wheel==0.36.1
+#
+#RUN set -ex && \
+#    pip install ruamel_yaml==0.15.100
+#
+#RUN set -ex && \
+#	#entrypoints==0.2.3 used in setup.py
+#	#This version of PyYAML==5.1 works with awscli
+#	#pyyaml installation from pypi
+#	pip install entrypoints==0.2.3 pyyaml==5.1
+#
+#
+#RUN set -ex && \
+#	#twine
+#	#https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
+#	#Add Python 3.8 support
+#	#see https://github.com/pypa/twine/pull/518
+#	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
+#																	  requests-toolbelt==0.9.1 \
+#																cffi==1.14.3 cryptography==3.1.1
+#
+#RUN set -ex && \
+#	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
+#	            requests==2.24.0 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2
+
+
+
+
+ENV PATH=${PATH}:/opt/anaconda3/bin
+ARG ANACONDA_VERSION=Anaconda3-2020.07
+
 
 # install anaconda, see https://github.com/ContinuumIO/docker-images/blob/master/anaconda/alpine/Dockerfile
 #RUN addgroup -S anaconda && \
@@ -124,16 +156,17 @@ RUN set -ex && \
      #tornado is used in jupyter.
      #entrypoint will be installed below (it is a distutils installed project).
      #numpy & scipy will be installed below (with graphviz).
-     conda uninstall pyyaml numba tornado entrypoints numpy scipy && \
+	 #sip will ne install below
+     conda uninstall pyyaml numba tornado entrypoints numpy scipy sip && \
      #hack to remove ruamel.yaml, because it is distutils installed project
      rm -fr /opt/anaconda3/lib/python3.8/site-packages/ruamel_yaml* && \
      #latest pip,setuptools,wheel
-     pip install --upgrade pip==20.2.4 setuptools==50.3.2 wheel==0.35.1 && \
+     pip install --upgrade pip==20.3.1 setuptools==51.0.0 wheel==0.36.1 && \
      pip install ruamel_yaml==0.15.100  && \
-     conda install conda=4.9.1 python=3.8.5 && \
+     conda install conda=4.9.2 python=3.8.5 && \
      #--- numpy related part ---
      #restoring numba dependencies, not available in pip (part 1)
-     conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 && \
+     conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 sip==4.19.13 && \
      conda clean -afy && \
      #restoring numba dependencies from pip (part 2)
      pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
@@ -166,7 +199,7 @@ RUN set -ex && \
 #extras
 RUN set -ex && \
 	 #boto3
-	 pip install awscli==1.18.54 boto3==1.13.4 botocore==1.16.4 colorama==0.4.3 && \
+	 pip install awscli==1.18.184 boto3==1.16.24 botocore==1.19.24 colorama==0.4.3 && \
 	 pip install python-dotenv==0.15.0 && \
 	 pip install bidict==0.21.2 && \
 
@@ -207,10 +240,36 @@ RUN set -ex && \
      #pyyaml installation from pypi
      pip install entrypoints==0.2.3 pyyaml==5.1
 
+#already installed, just for documentatation	 
 RUN set -ex && \
-    #already installed, just for documentatation
+	pip install ruamel_yaml==0.15.100  && \
+	conda install sip==4.19.13   && \
+	conda install conda=4.9.2 python=3.8.5 && \
+	#--- numpy related part ---
+	#restoring numba dependencies, not available in pip (part 1)
+	conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 && \
+	#conda clean -afy && \
+	#restoring numba dependencies from pip (part 2)
+	pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
+						llvmlite==0.34.0 mkl==2019.0 tbb==2020.3.254 && \
+    pip install ruamel_yaml==0.15.100 && \
+	#entrypoints==0.2.3 used in setup.py
+	#This version of PyYAML==5.1 works with awscli
+	#pyyaml installation from pypi
+	pip install entrypoints==0.2.3 pyyaml==5.1 && \
+	#twine
+	#https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
+	#Add Python 3.8 support
+	#see https://github.com/pypa/twine/pull/518
+	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
+											webencodings==0.5.1	bleach==3.2.1  requests-toolbelt==0.9.1 \
+											packaging==20.4 pyparsing==2.4.7 \
+															cffi==1.14.3 cryptography==3.1.1 && \
+	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2
 	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
-	            requests==2.24.0 tqdm==4.50.2  urllib3==1.25.11
+	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2																	  															  
+	
+	
 
 RUN set -ex && pip freeze > /etc/installed.txt
 
@@ -259,6 +318,6 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.0
-#docker push alexberkovich/alpine-anaconda3:0.1.0
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.1
+#docker push alexberkovich/alpine-anaconda3:0.1.1
 # EOF

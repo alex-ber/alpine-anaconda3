@@ -1,9 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## Unreleased
-- Some remarks was added.
+##[0.1.1] - 2020-12-12
+### Documantation
 - https://medium.com/@alex-ber/using-gnome-keyring-in-docker-container-2c8a56a894f7	Using GNOME Keyring in Docker Container
+- Some remarks was added.
+
+### Changed
+- musl* version changed from 1.1.24-r9 to 1.1.24-r10
+- curl* version changed from 7.69.1-r1 to 7.69.1-r3
+- update versions to awscli==1.18.184 boto3==1.16.24 botocore==1.19.24
+- update versions to pip==20.3.1 setuptools==51.0.0 wheel==0.36.1
+- update versions toml from 0.10.1 to 0.10.2
+- update versions conda
+- sip now is reintalled (using conda, pypi doesn't contain latest version)
+- section "already installed, just for documentatation" is extended
+   
+### Added
+- alexberkovich/alpine-anaconda3:0.1.1-slim is added that have only C-extension related packages (and very few more).
+
 
 
 ## [0.1.0] - 2020-11-17

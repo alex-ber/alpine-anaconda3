@@ -1,0 +1,89 @@
+# AlpineLinux with a glibc-2.29-r0 and python3
+FROM alexberkovich/alpine-anaconda3:0.1.1
+
+
+#TODO: Automate this process
+COPY rm.txt /etc/rm.txt
+
+
+RUN set -ex && \
+	pip uninstall --yes -r /etc/rm.txt
+
+RUN set -ex && \
+	pip install ruamel_yaml==0.15.100 six==1.15.0 tqdm==4.50.2 requests==2.24.0 requests-toolbelt==0.9.1 \
+			certifi==2020.12.5 chardet==3.0.4 idna==2.10 urllib3==1.25.11
+	
+											  
+
+#reuse			
+#already installed, just for documentatation	 
+RUN set -ex && \
+	pip install ruamel_yaml==0.15.100  && \
+	conda install sip==4.19.13   && \
+	conda install conda=4.9.2 python=3.8.5 && \
+	#--- numpy related part ---
+	#restoring numba dependencies, not available in pip (part 1)
+	conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 && \
+	#conda clean -afy && \
+	#restoring numba dependencies from pip (part 2)
+	pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
+						llvmlite==0.34.0 mkl==2019.0 tbb==2020.3.254 && \
+    pip install ruamel_yaml==0.15.100 && \
+	#entrypoints==0.2.3 used in setup.py
+	#This version of PyYAML==5.1 works with awscli
+	#pyyaml installation from pypi
+	pip install entrypoints==0.2.3 pyyaml==5.1 && \
+	#twine
+	#https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
+	#Add Python 3.8 support
+	#see https://github.com/pypa/twine/pull/518
+	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
+											webencodings==0.5.1	bleach==3.2.1  requests-toolbelt==0.9.1 \
+											packaging==20.4 pyparsing==2.4.7 \
+															cffi==1.14.3 cryptography==3.1.1 && \
+	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2
+	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
+	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2																	  
+
+
+RUN set -ex && \
+	#numpy installed by numba, remove
+	#uninstall mkl to save space (pip install mkl==2019.0 works)
+	pip uninstall --yes numpy mkl && \
+    conda clean -afy 
+
+				
+RUN set -ex && pip freeze > /etc/installed.txt
+
+#Cleanup
+RUN set -ex && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+#RUN apk del glibc-i18n make gcc musl-dev build-base gfortran
+RUN rm -rf /var/cache/apk/*
+
+
+WORKDIR /
+#CMD ["/bin/sh"]
+CMD tail -f /dev/null
+
+
+#docker system prune --all
+#docker rmi -f alpine-anaconda3-slim
+#docker rm -f conda3-slim
+#docker build  . -t alpine-anaconda3-slim --file Dockerfile-slim
+#docker run --name conda3-slim -d alpine-anaconda3-slim
+#smoke test
+#docker exec -it $(docker ps -q -n=1) pip config list
+#docker exec -it $(docker ps -q -n=1) bash
+#docker build --squash . -t alpine-anaconda3-slim --file Dockerfile-slim
+
+#see https://github.com/fabioz/PyDev.Debugger
+#docker run --env-file .env.docker --name conda3 -p 54717:54717/tcp -v //C/dev/work/:/opt/project -v //C/Program\ Files/JetBrains/PyCharm\ 2020.1.4/plugins/python/helpers:/opt/.pycharm_helpers -d alpine-anaconda3
+##docker exec -it $(docker ps -q -n=1) dbus-run-session bash
+#python /opt/.pycharm_helpers/pydev/pydevconsole.py --mode=server --port=54717 #run
+#python -u /opt/.pycharm_helpers/pydev/pydevd.py --cmd-line --multiprocess --qt-support=auto --port 54717 --file /opt/project/alpine-anaconda3/keyring_check.py #debug
+#runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
+
+
+#docker tag alpine-anaconda3-slim alexberkovich/alpine-anaconda3:0.1.1-slim
+#docker push alexberkovich/alpine-anaconda3:0.1.1-slim
+# EOF
