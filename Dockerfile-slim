@@ -85,7 +85,15 @@ CMD tail -f /dev/null
 
 #docker run --name conda3-slim -d alpine-anaconda3-slim
 #docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-e
+#docker run --name conda3-slim-e -d alpine-anaconda3-slim-e bash
+#populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim
+#based on https://docs.docker.com/engine/reference/commandline/commit/
+# docker commit --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+#    PYTHONUNBUFFERED=1 \
+#    LANG=C.UTF-8" \
+#    $(docker ps -q -n=1) alpine-anaconda3-slim-ef
 
-#docker tag alpine-anaconda3-slim-e alexberkovich/alpine-anaconda3:0.1.1-slim
+
+#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.1.1-slim
 #docker push alexberkovich/alpine-anaconda3:0.1.1-slim
 # EOF

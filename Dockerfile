@@ -317,9 +317,7 @@ CMD tail -f /dev/null
 #python -u /opt/.pycharm_helpers/pydev/pydevd.py --cmd-line --multiprocess --qt-support=auto --port 54717 --file /opt/project/alpine-anaconda3/keyring_check.py #debug
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
-#docker run --name conda3 -d alpine-anaconda3
-#docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-e
 
-#docker tag alpine-anaconda3-e alexberkovich/alpine-anaconda3:0.1.1
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.1
 #docker push alexberkovich/alpine-anaconda3:0.1.1
 # EOF
