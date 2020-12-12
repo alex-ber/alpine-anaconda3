@@ -40,7 +40,7 @@ RUN set -ex && \
 #for curl-dev see https://stackoverflow.com/a/51849028/1137529
 #for libffi-dev see https://stackoverflow.com/a/58396708/1137529
 RUN set -ex && \
-    apk add --no-cache openssl-dev=1.1.1g-r0 musl-dev=1.1.24-r10 cyrus-sasl-dev=2.1.27-r6 \
+    apk add --no-cache openssl-dev=1.1.1i-r0 musl-dev=1.1.24-r10 cyrus-sasl-dev=2.1.27-r6 \
                        linux-headers=5.4.5-r1 unixodbc-dev=2.3.7-r2 curl-dev=7.69.1-r3 libffi-dev==3.3-r2
 
 #https://stackoverflow.com/questions/5178416/libxml-install-error-using-pip
@@ -308,7 +308,7 @@ CMD tail -f /dev/null
 #smoke test
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
-#docker build --squash . -t alpine-anaconda3
+##docker build --squash . -t alpine-anaconda3
 
 #see https://github.com/fabioz/PyDev.Debugger
 #docker run --env-file .env.docker --name conda3 -p 54717:54717/tcp -v //C/dev/work/:/opt/project -v //C/Program\ Files/JetBrains/PyCharm\ 2020.1.4/plugins/python/helpers:/opt/.pycharm_helpers -d alpine-anaconda3
@@ -317,7 +317,9 @@ CMD tail -f /dev/null
 #python -u /opt/.pycharm_helpers/pydev/pydevd.py --cmd-line --multiprocess --qt-support=auto --port 54717 --file /opt/project/alpine-anaconda3/keyring_check.py #debug
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
+#docker run --name conda3 -d alpine-anaconda3
+#docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-e
 
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.1
+#docker tag alpine-anaconda3-e alexberkovich/alpine-anaconda3:0.1.1
 #docker push alexberkovich/alpine-anaconda3:0.1.1
 # EOF
