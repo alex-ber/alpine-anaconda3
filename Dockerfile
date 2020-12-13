@@ -173,7 +173,8 @@ RUN set -ex && \
                         llvmlite==0.34.0 mkl==2019.0 tbb==2020.3.254 && \
      #graphviz is used for pydot package
      #we want to ensure that numpy,scipy, python's anaconda version remain untouched
-     pip install graphviz==0.14.2 numpy==1.16.2 scipy==1.2.1 && \
+     pip install graphviz==0.14.2 numpy==1.16.2 && \
+     pip install scipy==1.2.1 && \
 
      #reinstall removed package by conda uninstall through pip (pinned versions)
      #we have scikit-learn==0.20.3 and joblib inside scikit-learn=
@@ -318,6 +319,6 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.1.1
-#docker push alexberkovich/alpine-anaconda3:0.1.1
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.2.0
+#docker push alexberkovich/alpine-anaconda3:0.2.0
 # EOF

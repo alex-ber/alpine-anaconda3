@@ -1,6 +1,6 @@
 # AlpineLinux with a glibc-2.29-r0 and python3
 FROM alexberkovich/alpine-anaconda3:0.1.1
-
+#FROM alexberkovich/alpine-anaconda3:0.2.0
 
 #TODO: Automate this process
 COPY rm.txt /etc/rm.txt
@@ -94,6 +94,6 @@ CMD tail -f /dev/null
 #    $(docker ps -q -n=1) alpine-anaconda3-slim-ef
 
 
-#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.1.1-slim
-#docker push alexberkovich/alpine-anaconda3:0.1.1-slim
+#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.2.0-slim
+#docker push alexberkovich/alpine-anaconda3:0.2.0-slim
 # EOF
