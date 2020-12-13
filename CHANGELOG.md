@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-##[0.2.1] - TBD
+##[0.2.0] - TBD
 * https://github.com/pypa/pip/issues/8368#issuecomment-743984123
 * Start to work on autuomation of uninstalling packaging. Pending finishing changes in PythonPackageSyncTool
 [https://github.com/alex-ber/PythonPackageSyncTool] .
