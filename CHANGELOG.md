@@ -1,12 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-##[0.2.0] - TBD
+##[0.2.0] - 2020-12-17
 * https://github.com/pypa/pip/issues/8368#issuecomment-743984123
-* Start to work on autuomation of uninstalling packaging. Pending finishing changes in PythonPackageSyncTool
+* Automation of uninstalling packaging via PythonPackageSyncTool
 [https://github.com/alex-ber/PythonPackageSyncTool] .
 
-##[0.2.0] - 2020-12-17
 ### Changed
 - alexberkovich/alpine-anaconda3:0.2.0
 ```
