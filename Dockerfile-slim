@@ -7,7 +7,7 @@ COPY python_package_sync_tool_config.yml /etc/python_package_sync_tool_config.ym
 #see python_package_sync_tool_config.yml for exceptions
 #site_packages=$(pip show python_package_sync_tool | grep "Location" |  sed -e 's/Location: //')
 RUN set -ex && \
-	pip install python_package_sync_tool==0.5.2 && \
+	pip install python_package_sync_tool==0.5.3 && \
 	mkdir -p /tmp/reqsync && \
 	cp /etc/python_package_sync_tool_config.yml /tmp/reqsync/config.yml && \
 	cd /tmp/reqsync/ && \
