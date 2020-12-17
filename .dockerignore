@@ -6,3 +6,4 @@ dist
 logs
 venv
 *.egg-info
+
