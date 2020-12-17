@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file.
 * Start to work on autuomation of uninstalling packaging. Pending finishing changes in PythonPackageSyncTool
 [https://github.com/alex-ber/PythonPackageSyncTool] .
 
+##[0.2.0] - 2020-12-17
+### Changed
+- alexberkovich/alpine-anaconda3:0.2.0
+```
+pip install graphviz==0.14.2 numpy==1.16.2 scipy==1.2.1 && \ 
+```
+was spltied into 2 lines
+
+```
+pip install graphviz==0.14.2 numpy==1.16.2 && \
+pip install scipy==1.2.1 && \
+```
+It is forwad-compatibility fix. It also optimizes building docker image now.
+See discussion here https://github.com/pypa/pip/issues/8368#issuecomment-743980139
+
+- alexberkovich/alpine-anaconda3:0.2.0-slim
+is now not use precomputed rm.txt for packages to be removed, but it uses my
+python_package_sync_tool https://github.com/alex-ber/PythonPackageSyncTool
+to calculate them on-the-fly. 
+
 
 ##[0.1.1] - 2020-12-12
 ### Documantation
