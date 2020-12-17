@@ -1,13 +1,22 @@
 # AlpineLinux with a glibc-2.29-r0 and python3
-FROM alexberkovich/alpine-anaconda3:0.1.1
-#FROM alexberkovich/alpine-anaconda3:0.2.0
+FROM alexberkovich/alpine-anaconda3:0.2.0
 
-#TODO: Automate this process
-COPY rm.txt /etc/rm.txt
+COPY python_package_sync_tool_config.yml /etc/python_package_sync_tool_config.yml
 
-
+#uninstall almost all
+#see python_package_sync_tool_config.yml for exceptions
+#site_packages=$(pip show python_package_sync_tool | grep "Location" |  sed -e 's/Location: //')
 RUN set -ex && \
-	pip uninstall --yes -r /etc/rm.txt
+	pip install python_package_sync_tool==0.5.2rc4 && \
+	mkdir -p /tmp/reqsync && \
+	cp /etc/python_package_sync_tool_config.yml /tmp/reqsync/config.yml && \
+	cd /tmp/reqsync/ && \
+	pip freeze | sed -e 's/ @ /==/' > installed.txt && \
+	python -m alexber.reqsync.data && \
+	cp rm.txt /etc/rm.txt  && \
+	cd / && \
+	rm -fr /tmp/reqsync/ && \
+	pip uninstall --yes -r /etc/rm.txt 
 
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100 six==1.15.0 tqdm==4.50.2 requests==2.24.0 requests-toolbelt==0.9.1 \

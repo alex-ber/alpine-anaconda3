@@ -1,0 +1,30 @@
+
+  treeroot:
+    source: installed.txt
+    destination: rm.txt
+    mutual_exclusion: True
+    remove:
+      - conda
+      - conda-package-handling
+      - icc-rt
+      - intel-openmp
+      - mkl
+      - mkl-fft
+      - mkl-random
+      - mkl-service
+      - pycosat
+      - sip
+      - tbb
+    add:
+  #    - graphviz==2.38.0
+  #    - entrypoints==0.2.3
+  #    - numpy==1.16.2
+  #    - PyYAML==5.1
+  #    - sasl==0.2.1
+  #    - scipy==1.2.1
+  #    - tables==3.4.4
+  #    - terminado==0.8.2
+  #    - tornado==5.1.1
+  #    - Twisted==19.2.0
+
+

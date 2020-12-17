@@ -23,7 +23,7 @@ RUN set -ex && \
 #libgnome-keyring
 RUN set -ex && \
    apk add --no-cache libgnome-keyring=3.12.0-r2 dbus-libs=1.12.18-r0 gnome-keyring=3.36.0-r0 \
-           linux-pam=1.3.1-r4 gcr-base=3.36.0-r0 p11-kit=0.23.20-r5 glib=2.64.6-r0 pcre=8.44-r0 \
+           linux-pam=1.3.1-r4 gcr-base=3.36.0-r0 p11-kit=0.23.22-r0 glib=2.64.6-r0 pcre=8.44-r0 \
            libmount=2.35.2-r0 libblkid=2.35.2-r0 libintl=0.20.2-r0 libcap-ng=0.7.10-r1
 
 #Git
