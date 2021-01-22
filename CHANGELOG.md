@@ -1,6 +1,26 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+
+##[0.2.1] - 2021-01-22
+### Changed
+Changing version of: 
+
+- scipy==1.2.1 change to scipy==1.5.4
+- matplotlib==3.0.3 change to matplotlib==3.1.3
+
+These are minimal version bumping that works on Windows.
+See 
+https://github.com/scipy/scipy/issues/12656
+https://github.com/microsoft/PTVS/issues/5863 
+
+
+### Added 
+
+- pydot==1.4.1
+
+
+
 ##[0.2.0] - 2020-12-17
 * https://github.com/pypa/pip/issues/8368#issuecomment-743984123
 * Automation of uninstalling packaging via PythonPackageSyncTool

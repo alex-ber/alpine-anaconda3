@@ -1,5 +1,5 @@
 # AlpineLinux with a glibc-2.29-r0 and python3
-FROM alexberkovich/alpine-anaconda3:0.2.0
+FROM alexberkovich/alpine-anaconda3:0.2.1
 
 COPY python_package_sync_tool_config.yml /etc/python_package_sync_tool_config.yml
 
@@ -21,11 +21,11 @@ RUN set -ex && \
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100 six==1.15.0 tqdm==4.50.2 requests==2.24.0 requests-toolbelt==0.9.1 \
 			certifi==2020.12.5 chardet==3.0.4 idna==2.10 urllib3==1.25.11
-	
+
 											  
 
 #reuse			
-#already installed, just for documentatation	 
+#already installed, just for documentatation
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100  && \
 	conda install sip==4.19.13   && \
@@ -47,13 +47,12 @@ RUN set -ex && \
 	#Add Python 3.8 support
 	#see https://github.com/pypa/twine/pull/518
 	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
-											webencodings==0.5.1	bleach==3.2.1  requests-toolbelt==0.9.1 \
+											webencodings==0.5.1 bleach==3.2.1  requests-toolbelt==0.9.1 \
 											packaging==20.4 pyparsing==2.4.7 \
 															cffi==1.14.3 cryptography==3.1.1 && \
 	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2
 	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
-	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2																	  
-
+	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2
 
 RUN set -ex && \
 	#numpy installed by numba, remove
@@ -103,6 +102,6 @@ CMD tail -f /dev/null
 #    $(docker ps -q -n=1) alpine-anaconda3-slim-ef
 
 
-#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.2.0-slim
-#docker push alexberkovich/alpine-anaconda3:0.2.0-slim
+#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.2.1-slim
+#docker push alexberkovich/alpine-anaconda3:0.2.1-slim
 # EOF

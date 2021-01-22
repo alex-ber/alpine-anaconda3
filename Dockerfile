@@ -172,9 +172,11 @@ RUN set -ex && \
      pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
                         llvmlite==0.34.0 mkl==2019.0 tbb==2020.3.254 && \
      #graphviz is used for pydot package
-     #we want to ensure that numpy,scipy, python's anaconda version remain untouched
-     pip install graphviz==0.14.2 numpy==1.16.2 && \
-     pip install scipy==1.2.1 && \
+     #we want to ensure numpy,scipy versions
+	 #Bumping scipy version up to the version that also work on Windows.
+	 #see https://github.com/scipy/scipy/issues/12656
+     pip install graphviz==0.14.2 pydot==1.4.1 numpy==1.16.2 && \
+     pip install scipy==1.5.4 && \
 
      #reinstall removed package by conda uninstall through pip (pinned versions)
      #we have scikit-learn==0.20.3 and joblib inside scikit-learn=
@@ -182,7 +184,10 @@ RUN set -ex && \
      #https://stackoverflow.com/questions/58700384/how-to-fix-typeerror-an-integer-is-required-got-type-bytes-error-when-tryin
      #https://github.com/apache/spark/blob/v2.4.5/python/pyspark/cloudpickle.py#L78-L93 (patch)
      ##PySpark https://issues.apache.org/jira/browse/SPARK-29536
-     pip install pandas==0.25.3 scikit-learn==0.22 joblib==0.14.1 matplotlib==3.0.3 shub==2.10.0 nltk==3.4.5 \
+     #This is minimal matplotlib==3.1.3 version that also works on Windows
+     #https://github.com/microsoft/PTVS/issues/5863
+
+     pip install pandas==0.25.3 scikit-learn==0.22 joblib==0.14.1 matplotlib==3.1.3 shub==2.10.0 nltk==3.4.5 \
                  seaborn==0.9.0 Bottleneck==1.2.1 && \
 
      #reinstall removed package by conda uninstall through pip (latest versions)
@@ -204,14 +209,15 @@ RUN set -ex && \
 	 pip install python-dotenv==0.15.0 && \
 	 pip install bidict==0.21.2 && \
 
-	 #fabric
+	 #fabric & pyOpenSSL
 	 pip install fabric==2.5.0 invoke==1.4.1 paramiko==2.7.2 PyNaCl==1.3.0  bcrypt==3.2.0 \
-	             cffi==1.14.3 cryptography==3.1.1 pycparser==2.20 PyNaCl==1.3.0 six==1.15.0 && \
+	             cffi==1.14.3 cryptography==3.1.1 pycparser==2.20 PyNaCl==1.3.0 six==1.15.0 \
+				 pyOpenSSL==19.1.0 && \
 
 	 #pytest extra
 	 pip install pytest==6.1.2 mock==4.0.2 pytest-assume==2.3.3 pytest-mock==3.3.1 \
 	             attrs==20.2.0 py==1.9.0 PyYAML==5.1 toml==0.10.2 pluggy==0.13.1 packaging==20.4 iniconfig==1.1.1 \
-	             pyparsing==2.4.7  && \
+	             pyparsing==2.4.7 attrs==20.2.0 requests==2.24.0 tqdm==4.50.2 && \
 
 	 #twine
      #https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
@@ -220,7 +226,8 @@ RUN set -ex && \
      pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
                                                                           requests-toolbelt==0.9.1  && \
      #SQLAlchemy & Hive
-	 pip install SQLAlchemy==1.3.3 thrift==0.13.0 thrift-sasl==0.4.2 sasl==0.2.1 PyHive==0.6.2
+	 pip install SQLAlchemy==1.3.3 thrift==0.13.0 thrift-sasl==0.4.2 sasl==0.2.1 PyHive==0.6.2 \
+	             pure-sasl==0.6.2 pure-transport==0.2.0 future==0.18.2
 
 
 
@@ -241,7 +248,7 @@ RUN set -ex && \
      #pyyaml installation from pypi
      pip install entrypoints==0.2.3 pyyaml==5.1
 
-#already installed, just for documentatation	 
+#already installed, just for documentatation
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100  && \
 	conda install sip==4.19.13   && \
@@ -263,14 +270,14 @@ RUN set -ex && \
 	#Add Python 3.8 support
 	#see https://github.com/pypa/twine/pull/518
 	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
-											webencodings==0.5.1	bleach==3.2.1  requests-toolbelt==0.9.1 \
+											webencodings==0.5.1 bleach==3.2.1  requests-toolbelt==0.9.1 \
 											packaging==20.4 pyparsing==2.4.7 \
 															cffi==1.14.3 cryptography==3.1.1 && \
-	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2
+	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2 
 	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
-	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2																	  															  
-	
-	
+	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2
+
+
 
 RUN set -ex && pip freeze > /etc/installed.txt
 
@@ -319,6 +326,6 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
-#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.2.0
-#docker push alexberkovich/alpine-anaconda3:0.2.0
+#docker tag alpine-anaconda3 alexberkovich/alpine-anaconda3:0.2.1
+#docker push alexberkovich/alpine-anaconda3:0.2.1
 # EOF
