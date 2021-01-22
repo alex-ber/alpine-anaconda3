@@ -14,7 +14,6 @@ See
 https://github.com/scipy/scipy/issues/12656
 https://github.com/microsoft/PTVS/issues/5863 
 
-
 ### Added 
 
 - pydot==1.4.1
