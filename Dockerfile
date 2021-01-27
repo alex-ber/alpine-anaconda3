@@ -166,7 +166,7 @@ RUN set -ex && \
      conda install conda=4.9.2 python=3.8.5 && \
      #--- numpy related part ---
      #restoring numba dependencies, not available in pip (part 1)
-     conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 sip==4.19.13 && \
+     conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 sip=4.19.13 && \
      conda clean -afy && \
      #restoring numba dependencies from pip (part 2)
      pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
@@ -251,7 +251,7 @@ RUN set -ex && \
 #already installed, just for documentatation
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100  && \
-	conda install sip==4.19.13   && \
+	conda install sip=4.19.13   && \
 	conda install conda=4.9.2 python=3.8.5 && \
 	#--- numpy related part ---
 	#restoring numba dependencies, not available in pip (part 1)

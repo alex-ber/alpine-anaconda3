@@ -28,7 +28,7 @@ RUN set -ex && \
 #already installed, just for documentatation
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100  && \
-	conda install sip==4.19.13   && \
+	conda install sip=4.19.13   && \
 	conda install conda=4.9.2 python=3.8.5 && \
 	#--- numpy related part ---
 	#restoring numba dependencies, not available in pip (part 1)

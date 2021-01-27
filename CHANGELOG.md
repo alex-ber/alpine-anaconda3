@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+### Changed
+sip==4.19.13 changed to sip=4.19.13 (non-functional change)
+
 ##[0.2.1] - 2021-01-22
 ### Changed
 Changing version of: 
