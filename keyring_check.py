@@ -8,9 +8,9 @@ import getpass
 #for Windows, see https://stackoverflow.com/questions/14756352/how-is-python-keyring-implemented-on-windows
 
 def main():
-    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     print(keyring.get_keyring())
-    print('ssssssssssssssssssssssssssssssss')
+    print('ssssssssassssssssssssssssssssssss')
     keyring.set_password("https://upload.pypi.org/legacy", "username",  getpass.getpass())
     print(keyring.get_password("https://upload.pypi.org/legacy", "username"))
 
