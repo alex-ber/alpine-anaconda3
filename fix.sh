@@ -3,3 +3,4 @@
 set -ex
 
 dos2unix.exe *.sh
+
