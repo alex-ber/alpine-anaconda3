@@ -3,8 +3,89 @@ All notable changes to this project will be documented in this file.
 
 
 ## Unreleased
+
+##[0.3.2] - 29/05/2021
+
+Mutli-arch Docker-image for amd64 and arm64v8 is created.
+
+Quote:
+"If you want to use ARM targets to reduce your bill, such as Raspberry Pis and AWS A1 instances, 
+or even keep using your old i386 servers, deploying everywhere can become a tricky problem 
+as you need to build your software for these platforms" 
+
+https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
+
+
+**Important note:** Only `--platform linux/arm64 alexberkovich/alpine-python3:0.3.2` works on AWS A1 instance.
+
+**Important note:** Slim version of arm64 is in in beta-version and can be removed without prior notice. 
+
+### Major added
+- Mutli-arch Docker-image for `amd64` and `arm64v8` is created.
+- Python-based version is added. It doesn't include Anaconda, close to slim version. Has variants for 
+`amd64` and `arm64v8`. 
+- `pg8000` version 1.19.3. It is `PostgreSQL` driver that complies with `DB-API 2.0` (`SqlAlchemy`).
+
+### Major changed
+- `Anaconda` version to Anaconda3-2021.05 (from Anaconda3-2020.07).
+This means, that many installed packaged was also changed. New packages was also added.
+- `Python` version changed to 3.8.8 (from 3.8.5).
+- On `ARM64` we don't have `numpy+mkl`, but `numby+openblas`. `mkl` and variant's are inavailable on `ARM64`.
+- `SQLAlchemy` version changed to 1.4.11 (from 1.3.3).  
+
 ### Changed
-sip==4.19.13 changed to sip=4.19.13 (non-functional change)
+- `cryptography` version changed to 3.4.7 (from 3.1.1)
+- `pyOpenSSL`version changed to 20.0.1 (from 19.1.0)
+- `cffi`version changed to 1.14.5 (from cffi==1.14.3)
+- `tqdm`version changed to 4.59.0 (from 4.50.2)
+- `conda` version changed to 4.10.1 (from 4.9.2)
+- `sip` version changed to 4.19.25 from (4.19.13).
+- `curl-dev` (OS-level package) version changed to 7.77.0-r0 (from curl-dev=7.69.1-r3).
+- `curl`(OS-level package) version changed to 7.77.0-r0 (from curl=7.69.1-r3).
+- `openssl-dev` (OS-level package) version changed to 1.1.1k-r0 (from openssl-dev=1.1.1i-r0).
+- `libx11`(OS-level package) version changed to 1.6.12-r1 (from 1.6.12-r0).
+- `ssl_client` (OS-level package) version changed to 1.31.1-r20 (from 1.31.1-r19).
+- `git` (OS-level package) changed to 2.26.3-r0 (from 2.26.2-r0).
+- `busybox`(OS-level package) version changed to 1.31.1-r20 (from 1.31.1-r19). 
+
+- In `Dockerfile-slim` for `AMD64` the following package will remain (in addition):
+`blas`, `libllvm10`, `icc-rt`, `intel-openmp`, `Cython`, `pycurl`.
+
+
+### Added
+- `Cython` version 0.29.13.
+
+- OS-level package `hdf5-dev`. Needed from built from source of `h5py` (current built uses 
+binarys (wheel) both for `AMD64` and for `ARM64`).
+
+- OS-Level package `cargo`. It contains Rust compiler. Required by `cryptography` (current built uses 
+binarys (wheel) both for `AMD64` and for `ARM64`).
+
+- `Dockerfile-slim` for `ARM64` is created. 
+
+###Documentation
+
+* `alexberkovich/alpine-anaconda3:0.3.2` is manifest file that aggregates 
+`alexberkovich/alpine-anaconda3:0.3.2-amd64` and `alexberkovich/alpine-anaconda3:0.3.2-arm64v8`. 
+Two last one are regular tagged images (built for specific CPU architecture).
+
+* `alexberkovich/alpine-anaconda3:0.3.2-slim` is manifest file that aggregates 
+`alexberkovich/alpine-anaconda3:0.3.2-slim-amd64` and `alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8`. 
+Two last one are slim tagged images (built for specific CPU architecture).
+
+* `alexberkovich/alpine-python3:0.3.2` is manifest file that aggregates 
+`alexberkovich/alpine-python3:0.3.2-amd64` and `alexberkovich/alpine-python3:0.3.2-arm64v8`. 
+Two last one are Python-based (without Anaconda) tagged images (built for specific CPU architecture).
+
+* `alexberkovich/alpine-anaconda3:latest` is the same as `alexberkovich/alpine-anaconda3:0.3.2` 
+(will change after new version will be released).
+
+* `alexberkovich/alpine-anaconda3:latest-slim` is the same as`alexberkovich/alpine-anaconda3:0.3.2-slim`
+ (will change after new version will be released).
+
+* `alexberkovich/alpine-python3:latest` is the same as `alexberkovich/alpine-python3:0.3.2` 
+(will change after new version will be released).
+
 
 ##[0.2.1] - 2021-01-22
 ### Changed

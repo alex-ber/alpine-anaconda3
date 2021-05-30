@@ -1,7 +1,19 @@
 # AlpineLinux with a glibc-2.29-r0 and python3
-FROM alexberkovich/alpine-anaconda3:0.2.1
+#ARG ARCH=
+ARG ARCH=amd64
+FROM --platform=linux/${ARCH} alexberkovich/alpine-anaconda3:0.3.2
+ARG ARCH
+ENV ARCH=${ARCH}
 
-COPY python_package_sync_tool_config.yml /etc/python_package_sync_tool_config.yml
+RUN set -ex && \
+   echo $ARCH > /etc/ARCH
+
+COPY python_package_sync_tool_config-${ARCH}.yml /etc/python_package_sync_tool_config.yml
+
+RUN set -ex && \
+     #hack to remove because it is distutils installed project
+     if [ "$ARCH" = "arm64v8" ]; then rm -fr /opt/anaconda3/lib/python3.8/site-packages/boto*; fi && \
+     if [ "$ARCH" = "arm64v8" ]; then rm -fr /opt/anaconda3/lib/python3.8/site-packages/entrypoints*; fi
 
 #uninstall almost all
 #see python_package_sync_tool_config.yml for exceptions
@@ -19,7 +31,7 @@ RUN set -ex && \
 	pip uninstall --yes -r /etc/rm.txt 
 
 RUN set -ex && \
-	pip install ruamel_yaml==0.15.100 six==1.15.0 tqdm==4.50.2 requests==2.24.0 requests-toolbelt==0.9.1 \
+	pip install ruamel_yaml==0.15.100 six==1.15.0 tqdm==4.59.0 requests==2.24.0 requests-toolbelt==0.9.1 \
 			certifi==2020.12.5 chardet==3.0.4 idna==2.10 urllib3==1.25.11
 
 											  
@@ -28,16 +40,26 @@ RUN set -ex && \
 #already installed, just for documentatation
 RUN set -ex && \
 	pip install ruamel_yaml==0.15.100  && \
-	conda install sip=4.19.13   && \
-	conda install conda=4.9.2 python=3.8.5 && \
-	#--- numpy related part ---
-	#restoring numba dependencies, not available in pip (part 1)
-	conda install blas=1.0 libllvm10=10.0.1 mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1 && \
-	#conda clean -afy && \
-	#restoring numba dependencies from pip (part 2)
-	pip install numba==0.51.2 intel-openmp==2019.0 icc_rt==2019.0 \
-						llvmlite==0.34.0 mkl==2019.0 tbb==2020.3.254 && \
-    pip install ruamel_yaml==0.15.100 && \
+	conda install sip=4.19.25   && \
+	if [ "$ARCH" = "arm64v8" ]; then conda install _openmp_mutex=5.1; fi && \
+    conda install conda=4.10.1 python=3.8.8 && \
+    pip install Cython==0.29.23 && \
+    #--- numpy related part ---
+    #restoring numba dependencies, not available in pip (part 1) \
+    if [ "$ARCH" = "arm64v8" ]; then insuffix=''; else insuffix='mkl-service=2.3.0 mkl_fft=1.2.0 mkl_random=1.1.1'; fi && \
+    conda install blas=1.0 libllvm10=10.0.1 ${insuffix} sip=4.19.25 && \
+    #On Arm64 Installation of llvmlite through pip is not supported,
+    #see http://llvmlite.pydata.org/en/latest/admin-guide/install.html#using-pip
+    #using conda in such case
+    #restoring numba dependencies from pip (part 2)
+    if [ "$ARCH" = "arm64v8" ]; then conda install llvmlite=0.36.0 ; fi && \
+    conda clean -afy && \
+    if [ "$ARCH" = "arm64v8" ]; \
+             then insuffix=''; else \
+             insuffix='mkl==2021.2.0 mkl_fft==1.2.0 mkl_random==1.1.1 intel-openmp==2021.2 \
+                       mkl-service==2.3.0 tbb==2021.2.0'; fi && \
+    pip install numba==0.53.1 llvmlite==0.36.0 sip==4.19.25 ${insuffix} numpy==1.16.2 && \
+
 	#entrypoints==0.2.3 used in setup.py
 	#This version of PyYAML==5.1 works with awscli
 	#pyyaml installation from pypi
@@ -47,18 +69,21 @@ RUN set -ex && \
 	#Add Python 3.8 support
 	#see https://github.com/pypa/twine/pull/518
 	pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
-											webencodings==0.5.1 bleach==3.2.1  requests-toolbelt==0.9.1 \
+                                            webencodings==0.5.1 bleach==3.2.1 requests-toolbelt==0.9.1 \
 											packaging==20.4 pyparsing==2.4.7 \
-															cffi==1.14.3 cryptography==3.1.1 && \
-	#pin pyOpenSSL==19.1.0 requests==2.24.0 tqdm==4.50.2
-	pip install cffi==1.14.3 cryptography==3.1.1 idna==2.10 pycparser==2.20  pyOpenSSL==19.1.0 \
-	            requests==2.24.0 chardet==3.0.4 tqdm==4.50.2  urllib3==1.25.11 toml==0.10.2
+															cffi==1.14.5 cryptography==3.4.7 && \
+	#pin pyOpenSSL==20.0.1 requests==2.24.0 tqdm==4.59.0
+	pip install cffi==1.14.5 cryptography==3.4.7 idna==2.10 pycparser==2.20  pyOpenSSL==20.0.1 \
+	            requests==2.24.0 chardet==3.0.4 tqdm==4.59.0  urllib3==1.25.11 toml==0.10.2
+
+
 
 RUN set -ex && \
 	#numpy installed by numba, remove
 	#uninstall mkl to save space (pip install mkl==2019.0 works)
-	pip uninstall --yes numpy mkl && \
-    conda clean -afy 
+	if [ "$ARCH" = "arm64v8" ]; then suffix='numpy'; else suffix='numpy mkl'; fi && \
+	pip uninstall --yes ${suffix} && \
+    conda clean -afy
 
 				
 RUN set -ex && pip freeze > /etc/installed.txt
@@ -76,13 +101,16 @@ CMD tail -f /dev/null
 
 #docker system prune --all
 #docker rmi -f alpine-anaconda3-slim
-#docker rm -f conda3-slim
-#docker build  . -t alpine-anaconda3-slim --file Dockerfile-slim
-#docker run --name conda3-slim -d alpine-anaconda3-slim
+#docker rm -f conda3-slim-amd64 conda3-slim-arm64v8
+#docker build . -t alpine-anaconda3-slim-amd64 --build-arg ARCH=amd64 --file Dockerfile-slim
+#docker build . -t alpine-anaconda3-slim-arm64v8 --build-arg ARCH=arm64/v8 --file Dockerfile-slim
+#docker run --name conda3-slim-amd64 -d alpine-anaconda3-slim-amd64
+#docker run --name conda3-slim-arm64v8 -d alpine-anaconda3-slim-arm64v8
 #smoke test
 #docker exec -it $(docker ps -q -n=1) pip config list
 #docker exec -it $(docker ps -q -n=1) bash
-##docker build --squash . -t alpine-anaconda3-slim --file Dockerfile-slim
+##docker build --squash . -t alpine-anaconda3-slim-amd64 --build-arg ARCH=amd64
+##docker build --squash . -t alpine-anaconda3-slim-arm64v8 --build-arg ARCH=arm64v8
 
 #see https://github.com/fabioz/PyDev.Debugger
 #docker run --env-file .env.docker --name conda3 -p 54717:54717/tcp -v //C/dev/work/:/opt/project -v //C/Program\ Files/JetBrains/PyCharm\ 2020.1.4/plugins/python/helpers:/opt/.pycharm_helpers -d alpine-anaconda3
@@ -91,17 +119,41 @@ CMD tail -f /dev/null
 #python -u /opt/.pycharm_helpers/pydev/pydevd.py --cmd-line --multiprocess --qt-support=auto --port 54717 --file /opt/project/alpine-anaconda3/keyring_check.py #debug
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
-#docker run --name conda3-slim -d alpine-anaconda3-slim
-#docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-e
-#docker run --name conda3-slim-e -d alpine-anaconda3-slim-e bash
-#populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim
+
+#docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-amd64-e
+#docker run --name conda3-slim-amd64-e -d alpine-anaconda3-slim-amd64-e bash
+#populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim-amd64
 #based on https://docs.docker.com/engine/reference/commandline/commit/
-# docker commit --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+# docker commit --change "CMD /bin/sh"  --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+#    ARCH=amd64 \
 #    PYTHONUNBUFFERED=1 \
 #    LANG=C.UTF-8" \
-#    $(docker ps -q -n=1) alpine-anaconda3-slim-ef
+#    $(docker ps -q -n=1) alpine-anaconda3-slim-amd64-ef
+
+#docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-arm64v8-e
+#docker run --name conda3-slim-arm64v8-e -d alpine-anaconda3-slim-arm64v8-e bash
+#populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim-arm64v8
+#based on https://docs.docker.com/engine/reference/commandline/commit/
+# docker commit --change "CMD /bin/sh" --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+#    ARCH=arm64v8 \
+#    PYTHONUNBUFFERED=1 \
+#    LANG=C.UTF-8" \
+#    $(docker ps -q -n=1) alpine-anaconda3-slim-arm64v8-ef
 
 
-#docker tag alpine-anaconda3-slim-ef alexberkovich/alpine-anaconda3:0.2.1-slim
-#docker push alexberkovich/alpine-anaconda3:0.2.1-slim
+#docker tag alpine-anaconda3-slim-arm64v8-ef alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
+#docker tag alpine-anaconda3-slim-amd64-ef alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker push alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
+#docker push alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest create alexberkovich/alpine-anaconda3:0.3.2-slim --amend alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.2-slim alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:0.3.2-slim alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest push --purge alexberkovich/alpine-anaconda3:0.3.2-slim
+
+#docker manifest create alexberkovich/alpine-anaconda3:latest-slim --amend alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.2-latest-slim alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:latest-slim alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest push --purge alexberkovich/alpine-anaconda3:latest-slim
+
 # EOF
+

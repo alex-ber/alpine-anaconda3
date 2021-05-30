@@ -6,15 +6,21 @@
     remove:
       - conda
       - conda-package-handling
+      - blas
+      - libllvm10
       - icc-rt
       - intel-openmp
+      - Cython
       - mkl
       - mkl-fft
       - mkl-random
       - mkl-service
+      - pycurl
       - pycosat
       - sip
       - tbb
+      - numba
+      - numpy
     add:
   #    - graphviz==2.38.0
   #    - entrypoints==0.2.3
