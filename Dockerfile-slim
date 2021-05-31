@@ -1,7 +1,7 @@
 # AlpineLinux with a glibc-2.29-r0 and python3
 #ARG ARCH=
 ARG ARCH=amd64
-FROM --platform=linux/${ARCH} alexberkovich/alpine-anaconda3:0.3.2
+FROM --platform=linux/${ARCH} alexberkovich/alpine-anaconda3:0.3.3
 ARG ARCH
 ENV ARCH=${ARCH}
 
@@ -120,39 +120,47 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
+#docker run --name conda3-slim-amd64 -d alpine-anaconda3-slim-amd64
 #docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-amd64-e
 #docker run --name conda3-slim-amd64-e -d alpine-anaconda3-slim-amd64-e bash
 #populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim-amd64
+#populate from docker inspect -f "{{ .Config.Cmd }}" alpine-anaconda3-slim-amd64
 #based on https://docs.docker.com/engine/reference/commandline/commit/
-# docker commit --change "CMD /bin/sh"  --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+# docker commit --change "CMD
+#   CMD [\"/bin/sh\"]" \
+#               --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
 #    ARCH=amd64 \
 #    PYTHONUNBUFFERED=1 \
 #    LANG=C.UTF-8" \
 #    $(docker ps -q -n=1) alpine-anaconda3-slim-amd64-ef
 
+#docker run --name conda3-slim-arm64v8 -d alpine-anaconda3-slim-arm64v8
 #docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-slim-arm64v8-e
 #docker run --name conda3-slim-arm64v8-e -d alpine-anaconda3-slim-arm64v8-e bash
 #populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-slim-arm64v8
+#populate from docker inspect -f "{{ .Config.Cmd }}" alpine-anaconda3-slim-arm64v8
 #based on https://docs.docker.com/engine/reference/commandline/commit/
-# docker commit --change "CMD /bin/sh" --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+# docker commit --change "CMD
+#   CMD [\"/bin/sh\"]" \
+#               --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
 #    ARCH=arm64v8 \
 #    PYTHONUNBUFFERED=1 \
 #    LANG=C.UTF-8" \
 #    $(docker ps -q -n=1) alpine-anaconda3-slim-arm64v8-ef
 
 
-#docker tag alpine-anaconda3-slim-arm64v8-ef alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
-#docker tag alpine-anaconda3-slim-amd64-ef alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
-#docker push alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
-#docker push alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
-#docker manifest create alexberkovich/alpine-anaconda3:0.3.2-slim --amend alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.2-slim alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:0.3.2-slim alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
-#docker manifest push --purge alexberkovich/alpine-anaconda3:0.3.2-slim
+#docker tag alpine-anaconda3-slim-amd64-ef alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
+#docker tag alpine-anaconda3-slim-arm64v8-ef alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8
+#docker push alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
+#docker push alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8
+#docker manifest create alexberkovich/alpine-anaconda3:0.3.3-slim --amend alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.3-slim alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:0.3.3-slim alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
+#docker manifest push --purge alexberkovich/alpine-anaconda3:0.3.3-slim
 
-#docker manifest create alexberkovich/alpine-anaconda3:latest-slim --amend alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.2-latest-slim alexberkovich/alpine-anaconda3:0.3.2-slim-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:latest-slim alexberkovich/alpine-anaconda3:0.3.2-slim-amd64
+#docker manifest create alexberkovich/alpine-anaconda3:latest-slim --amend alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.3-latest-slim alexberkovich/alpine-anaconda3:0.3.3-slim-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:latest-slim alexberkovich/alpine-anaconda3:0.3.3-slim-amd64
 #docker manifest push --purge alexberkovich/alpine-anaconda3:latest-slim
 
 # EOF

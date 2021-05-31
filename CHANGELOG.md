@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 
 ## Unreleased
+##[0.3.3] - 31/05/2021
+
+### Added
+- OS-level package `openblas-dev`. Needed from built from source of `scipy` in `alpine-python3` dockers  
+(both for `AMD64` and for `ARM64`). Not needed for Anaconda-based images, but added theire anyway for unifromity. 
+See `Failed to install scipy in alpine-python dockerfile for AMR64v8` 
+https://github.com/alex-ber/alpine-anaconda3/issues/3
+
+### Changed
+- Fixed `CMD` entry for all docker images. See https://github.com/alex-ber/alpine-anaconda3/issues/4
+
 
 ##[0.3.2] - 29/05/2021
 

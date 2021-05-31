@@ -59,12 +59,13 @@ RUN set -ex && \
 RUN set -ex && \
     apk add --no-cache libxml2-dev=2.9.10-r5 libxslt-dev=1.1.34-r0
 
-#gcc, gfortran, lapack (requires ssl layer above)
+#gcc, gfortran, lapack, blas (requires ssl layer above)
 #see https://stackoverflow.com/questions/11912878/gcc-error-gcc-error-trying-to-exec-cc1-execvp-no-such-file-or-directory
 #see https://stackoverflow.com/a/38571314/1137529
+#see https://unix.stackexchange.com/questions/550290/using-blas-in-alpine-linux
 RUN set -ex && \
     apk add --no-cache make=4.3-r0 gcc=9.3.0-r2 build-base=0.5-r2 lapack-dev=3.9.0-r2 freetype-dev=2.10.4-r0 \
-                       gfortran=9.3.0-r2
+                       gfortran=9.3.0-r2 openblas-dev=0.3.9-r2
 
 #https://github.com/h5py/h5py/issues/1461#issuecomment-562871041
 #https://stackoverflow.com/questions/66705108/how-to-install-hdf5-on-docker-image-with-linux-alpine-3-13
@@ -376,41 +377,50 @@ CMD tail -f /dev/null
 #runfile('/opt/project/alpine-anaconda3/keyring_check.py', wdir='/opt/project/alpine-anaconda3')
 
 
-#docker tag alpine-anaconda3-arm64v8 alexberkovich/alpine-anaconda3:0.3.1-arm64v8
-#docker tag alpine-anaconda3-amd64 alexberkovich/alpine-anaconda3:0.3.1-amd64
+#docker tag alpine-anaconda3-arm64v8 alexberkovich/alpine-anaconda3:0.3.3-arm64v8
+#docker tag alpine-anaconda3-amd64 alexberkovich/alpine-anaconda3:0.3.3-amd64
 
+
+#docker run --name conda3-amd64 -d alpine-anaconda3-amd64
 #docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-amd64-e
 #docker run --name conda3-amd64-e -d alpine-anaconda3-amd64-e bash
 #populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-amd64
+#populate from docker inspect -f "{{ .Config.Cmd }}" alpine-anaconda3-amd64
 #based on https://docs.docker.com/engine/reference/commandline/commit/
-# docker commit --change "CMD /bin/sh"  --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+# docker commit --change "CMD
+#    CMD [\"/bin/sh\"]" \
+#               --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
 #    ARCH=amd64 \
 #    PYTHONUNBUFFERED=1 \
 #    LANG=C.UTF-8" \
 #    $(docker ps -q -n=1) alpine-anaconda3-amd64-ef
 
+#docker run --name conda3-arm64v8 -d alpine-anaconda3-arm64v8
 #docker export $(docker ps -q -n=1) | docker import - alpine-anaconda3-arm64v8-e
 #docker run --name conda3-arm64v8-e -d alpine-anaconda3-arm64v8-e bash
 #populate from docker inspect -f "{{ .Config.Env }}" alpine-anaconda3-arm64v8
+#populate from docker inspect -f "{{ .Config.Cmd }}" alpine-anaconda3-amd64
 #based on https://docs.docker.com/engine/reference/commandline/commit/
-# docker commit --change "CMD /bin/sh" --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
+# docker commit --change "CMD
+#    CMD [\"/bin/sh\"]" \
+#               --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/anaconda3/bin \
 #    ARCH=arm64v8 \
 #    PYTHONUNBUFFERED=1 \
 #    LANG=C.UTF-8" \
 #    $(docker ps -q -n=1) alpine-anaconda3-arm64v8-ef
 
 
-#docker tag alpine-anaconda3-arm64v8-ef alexberkovich/alpine-anaconda3:0.3.2-arm64v8
-#docker tag alpine-anaconda3-amd64-ef alexberkovich/alpine-anaconda3:0.3.2-amd64
-#docker push alexberkovich/alpine-anaconda3:0.3.2-arm64v8
-#docker push alexberkovich/alpine-anaconda3:0.3.2-amd64
-#docker manifest create alexberkovich/alpine-anaconda3:0.3.2 --amend alexberkovich/alpine-anaconda3:0.3.2-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.2 alexberkovich/alpine-anaconda3:0.3.2-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:0.3.2 alexberkovich/alpine-anaconda3:0.3.2-amd64
-#docker manifest push --purge alexberkovich/alpine-anaconda3:0.3.2
+#docker tag alpine-anaconda3-amd64-ef alexberkovich/alpine-anaconda3:0.3.3-amd64
+#docker tag alpine-anaconda3-arm64v8-ef alexberkovich/alpine-anaconda3:0.3.3-arm64v8
+#docker push alexberkovich/alpine-anaconda3:0.3.3-amd64
+#docker push alexberkovich/alpine-anaconda3:0.3.3-arm64v8
+#docker manifest create alexberkovich/alpine-anaconda3:0.3.3 --amend alexberkovich/alpine-anaconda3:0.3.3-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.3-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:0.3.3 alexberkovich/alpine-anaconda3:0.3.3-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:0.3.3 alexberkovich/alpine-anaconda3:0.3.3-amd64
+#docker manifest push --purge alexberkovich/alpine-anaconda3:0.3.3
 
-#docker manifest create alexberkovich/alpine-anaconda3:latest --amend alexberkovich/alpine-anaconda3:0.3.2-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.2-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:latest alexberkovich/alpine-anaconda3:0.3.2-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:latest alexberkovich/alpine-anaconda3:0.3.2-amd64
+#docker manifest create alexberkovich/alpine-anaconda3:latest --amend alexberkovich/alpine-anaconda3:0.3.3-arm64v8 --amend alexberkovich/alpine-anaconda3:0.3.3-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-anaconda3:latest alexberkovich/alpine-anaconda3:0.3.3-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-anaconda3:latest alexberkovich/alpine-anaconda3:0.3.3-amd64
 #docker manifest push --purge alexberkovich/alpine-anaconda3:latest
 # EOF
