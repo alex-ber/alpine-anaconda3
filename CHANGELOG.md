@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 
 ## Unreleased
+
+
 ##[0.3.3] - 31/05/2021
+See detail description of the 0.3.x series here 
+https://medium.com/geekculture/docker-container-with-python-for-arm64-amd64-779c3e90d293
+
 
 ### Added
 - OS-level package `openblas-dev`. Needed from built from source of `scipy` in `alpine-python3` dockers  
