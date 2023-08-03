@@ -62,6 +62,29 @@ installation from Pypi.
     There are some issues of reinstalling them with Python 3.8. It is recommended to use llvmlite 0.34.0
     for this, that what I did. 
 
+**UPDATE: 2023-08-03:**
+
+* Dropped OS support of dbus-launch, dbus-run-session, keyring (breaking change) 
+
+* Dropped version of OS packages in the Dockerfile-python.
+
+* Upgrade pyyaml==6.0.1 (major version update)
+
+* Upgrade awscli==1.29.17 boto3==1.28.17 botocore==1.31.17 colorama==0.4.4 s3transfer==0.6.1 (major versionhs upgrade).
+
+* Added OS level packages for working with images: jpeg-dev libjpeg libjpeg-turbo libjpeg-turbo-dev  
+  
+* Added Explicit OS package maturin.It is required for pyo3, that is required for successful built of cryptography module. 
+See https://pyo3.rs/v0.19.2/getting_started
+("failed to get `pyo3` as a dependency of package `cryptography-rust v0.1.0")
+
+See CHANGELOG.md for more details.
+
+&nbsp;
+&nbsp;
+
+
+
 
 There are also some extra packages, see dockerfiles extras section.
 If you need nlt_data see https://github.com/alex-ber/alpine-anaconda3/issues/2
