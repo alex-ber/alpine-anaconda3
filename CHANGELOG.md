@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 
+##[0.3.4] - 04/08/2023
+### Added
+- OS level packages for working with images:  jpeg-dev libjpeg libjpeg-turbo libjpeg-turbo-dev
+- Explicit OS package maturin.It is required for pyo3, that is required for successful built of cryptography module. 
+See https://pyo3.rs/v0.19.2/getting_started
+("failed to get `pyo3` as a dependency of package `cryptography-rust v0.1.0")
+- Added PIP_ROOT_USER_ACTION=ignore to avoid meaningless message "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+  See: https://stackoverflow.com/questions/68673221/warning-running-pip-as-the-root-user
+
+
+### Changed
+- Upgrade pyyaml==6.0.1 (major version update).
+- Upgrade awscli==1.29.17 boto3==1.28.17 botocore==1.31.17 colorama==0.4.3 s3transfer==0.6.1 (major versionhs upgrade).
+- Upgrade pip==23.2.1 setuptools==68.0.0 (major versions update).
+- Upgrade SQLAlchemy from 1.4.11 to 1.4.31  (minour version update).  
+- Upgrade pg8000 from 1.19.3 to 1.29.4 (major update).
+- Upgrade cryptography from 3.4.7 to 41.0.3.
+- Upgrade pyparsing==2.4.7 to 3.1.1.
+- Upgrade docutils from 0.15.2 to 0.16.
+- Upgrade invoke from 1.4.1 to 1.7.3.
+- Upgrade colorama from 0.4.3 to 0.4.4
+- Upgrade six from 1.15.0 to 1.16.0.
+- Upgrade zip from 3.6.2 to zipp==3.16.2.
+
+### Dropped
+- Dropped OS support of dbus-launch, dbus-run-session, keyring (breaking change) 
+- Dropped version of OS packages Dockerfile-python.
+
+
 ##[0.3.3] - 31/05/2021
 See detail description of the 0.3.x series here 
 https://medium.com/geekculture/docker-container-with-python-for-arm64-amd64-779c3e90d293

@@ -12,6 +12,12 @@ RUN set -ex && \
 ENV PYTHONUNBUFFERED=1
 ENV LANG=C.UTF-8
 
+# Suppress non-meannigfull WARNING:
+#WARNING: "Running pip as root will break packages and permissions. You should install packages reliably \
+#by using venv: https://pip.pypa.io/warnings/venv"
+# See: https://stackoverflow.com/questions/68673221/warning-running-pip-as-the-root-user
+ENV PIP_ROOT_USER_ACTION=ignore
+
 #see below
 #ARG GLIBC_REPO=https://github.com/$GLIBC_REPO_INFIX/alpine-pkg-glibc
 ARG GLIBC_VERSION=2.32-r0
@@ -21,27 +27,23 @@ ARG GLIBC_VERSION=2.32-r0
 #updating from alpine 3.8 to 3.12 as of 23.05.2021
 RUN set -ex && \
     #apk -U upgrade  && \
-    apk add --no-cache musl=1.1.24-r10 busybox=1.31.1-r20 alpine-baselayout=3.2.0-r7 ca-certificates-bundle \
-                       ssl_client=1.31.1-r20 musl-utils=1.1.24-r10
-
-#dbus-launch, dbus-run-session
-RUN set -ex && \
-    apk add --no-cache dbus=1.12.18-r0 dbus-x11=1.12.18-r0 libx11=1.6.12-r1 libxcb=1.14-r1 libxdmcp=1.1.3-r0 \
-                           libxcb=1.14-r1 libx11=1.6.12-r1
-
-#libgnome-keyring
-RUN set -ex && \
-   apk add --no-cache libgnome-keyring=3.12.0-r2 dbus-libs=1.12.18-r0 gnome-keyring=3.36.0-r0 \
-           linux-pam=1.3.1-r4 gcr-base=3.36.0-r0 p11-kit=0.23.22-r0 glib=2.64.6-r0 pcre=8.44-r0 \
-           libmount=2.35.2-r0 libblkid=2.35.2-r0 libintl=0.20.2-r0 libcap-ng=0.7.10-r1
+    apk add --no-cache musl busybox alpine-baselayout ca-certificates-bundle \
+                       ssl_client musl-utils
 
 #Git
 RUN set -ex && \
-   apk add --no-cache git=2.26.3-r0 expat=2.2.9-r1 pcre2=10.35-r0 && \
+   apk add --no-cache git && \
    #git config --global credential.helper store
    #git config --global credential.helper cache
    #see https://git-scm.com/docs/git-credential-cache
    git config --global credential.helper 'cache --timeout=3600'
+
+
+
+#for maturing see https://pyo3.rs/v0.19.2/getting_started ("failed to get `pyo3` as a dependency
+#                                                          of package `cryptography-rust v0.1.0")
+RUN set -ex && \
+    apk add --no-cache maturin --repository=https://dl-cdn.alpinelinux.org/alpine/v3.14/community
 
 
 
@@ -50,25 +52,33 @@ RUN set -ex && \
 #for libffi-dev see https://stackoverflow.com/a/58396708/1137529
 #for cargo see https://github.com/pyca/cryptography/issues/5776#issuecomment-775158562
 RUN set -ex && \
-    apk add --no-cache openssl-dev=1.1.1k-r0 musl-dev=1.1.24-r10 cyrus-sasl-dev=2.1.27-r6 \
-                       linux-headers=5.4.5-r1 unixodbc-dev=2.3.7-r2 curl-dev=7.77.0-r0 libffi-dev==3.3-r2 cargo==1.44.0-r0
+    apk add --no-cache maturin openssl-dev musl-dev cyrus-sasl-dev \
+                       linux-headers unixodbc-dev curl-dev libffi-dev cargo
 
 #https://stackoverflow.com/questions/5178416/libxml-install-error-using-pip
 RUN set -ex && \
-    apk add --no-cache libxml2-dev=2.9.10-r5 libxslt-dev=1.1.34-r0
+    apk add --no-cache libxml2-dev libxslt-dev
 
 #gcc, gfortran, lapack, blas (requires ssl layer above)
 #see https://stackoverflow.com/questions/11912878/gcc-error-gcc-error-trying-to-exec-cc1-execvp-no-such-file-or-directory
 #see https://stackoverflow.com/a/38571314/1137529
 #see https://unix.stackexchange.com/questions/550290/using-blas-in-alpine-linux
 RUN set -ex && \
-    apk add --no-cache make=4.3-r0 gcc=9.3.0-r2 build-base=0.5-r2 lapack-dev=3.9.0-r2 freetype-dev=2.10.4-r0 \
+    apk add --no-cache make=4.3-r0 gcc=9.3.0-r2 build-base=0.5-r2 lapack-dev=3.9.0-r2 freetype-dev=2.10.4-r2 \
                        gfortran=9.3.0-r2 openblas-dev=0.3.9-r2
 
 #https://github.com/h5py/h5py/issues/1461#issuecomment-562871041
 #https://stackoverflow.com/questions/66705108/how-to-install-hdf5-on-docker-image-with-linux-alpine-3-13
 RUN set -ex && \
-    apk add --no-cache hdf5-dev=1.10.6-r1
+    apk add --no-cache hdf5-dev
+
+#https://pillow.readthedocs.io/en/latest/installation.html
+#Pillow
+#zlib-dev exists in parent
+#libjpeg-turbo and libjpeg-turbo-dev doesn't mentioned in the link above
+RUN set -ex && \
+    apk add jpeg-dev libjpeg libjpeg-turbo libjpeg-turbo-dev
+
 
 
 #bash+usefull utils
@@ -85,7 +95,7 @@ RUN set -ex && \
     #Remarked by Alex \
     #apk -U upgrade && \
     #Alex added --no-cache
-    apk --no-cache add libstdc++=9.3.0-r2 curl=7.77.0-r0 && \
+    apk --no-cache add curl && \
     #Added  by Alex \
     #Alex added --no-cache
     apk --no-cache add net-tools=1.60_git20140218-r2 && \
@@ -102,6 +112,13 @@ RUN set -ex && \
     ( /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true ) && \
     echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
     /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
+
+#https://pillow.readthedocs.io/en/latest/installation.html
+#Pillow
+#zlib-dev exists in parent
+#libjpeg-turbo and libjpeg-turbo-dev doesn't mentioned in the link above
+RUN set -ex && \
+    apk add jpeg-dev libjpeg libjpeg-turbo libjpeg-turbo-dev
 
 
 #https://stackoverflow.com/questions/9510474/removing-pips-cache
@@ -124,16 +141,14 @@ RUN set -ex && \
 
 
 RUN set -ex && \
-   pip install --upgrade pip==20.3.1 setuptools==51.0.0 wheel==0.36.1
+   pip install --upgrade pip==23.2.1 setuptools==68.0.0 wheel==0.36.1
 
 RUN set -ex && \
     pip install ruamel_yaml==0.15.100
 
 RUN set -ex && \
         #entrypoints==0.2.3 used in setup.py
-        #This version of PyYAML==5.1 works with awscli
-        #pyyaml installation from pypi
-        pip install entrypoints==0.2.3 pyyaml==5.1
+        pip install entrypoints==0.2.3 pyyaml==6.0.1
 
 
 #slim
@@ -142,40 +157,35 @@ RUN set -ex && \
         #https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
         #Add Python 3.8 support
         #see https://github.com/pypa/twine/pull/518
-        pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
+        pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.4 rfc3986==1.4.0 readme-renderer==28.0  \
                                             webencodings==0.5.1 bleach==3.2.1 requests-toolbelt==0.9.1 \
-                                                                                        packaging==20.4 pyparsing==2.4.7 \
-                                                                                                                        cffi==1.14.5 cryptography==3.4.7 && \
-
+                                                                packaging==20.4 pyparsing==3.1.1 \
+                                                                    cffi==1.14.5  cryptography==41.0.3 \
+        \
         #pin pyOpenSSL==20.0.1 requests==2.24.0 tqdm==4.59.0
-        pip install cffi==1.14.5 cryptography==3.4.7 idna==2.10 pycparser==2.20  pyOpenSSL==20.0.1 \
-                    requests==2.24.0 chardet==3.0.4 tqdm==4.59.0  urllib3==1.25.11 toml==0.10.2
+        pip install cffi==1.14.5 cryptography==41.0.3 idna==2.10 pycparser==2.20  pyOpenSSL==20.0.1 \
+                    docutils==0.16 requests==2.24.0 chardet==3.0.4 tqdm==4.59.0  urllib3==1.25.11 toml==0.10.2
 
-#extras
+##extras
 RUN set -ex && \
-         #boto3
-         pip install awscli==1.18.184 boto3==1.16.24 botocore==1.19.24 colorama==0.4.3 && \
+         #boto3 \
+         pip install awscli==1.29.17 boto3==1.28.17 botocore==1.31.17 colorama==0.4.4 s3transfer==0.6.1 && \
          pip install python-dotenv==0.15.0 && \
          pip install bidict==0.21.2 && \
-
+         \
          #fabric & pyOpenSSL
-         pip install fabric==2.5.0 invoke==1.4.1 paramiko==2.7.2 PyNaCl==1.3.0  bcrypt==3.2.0 \
-                     cffi==1.14.5 cryptography==3.4.7 pycparser==2.20 PyNaCl==1.3.0 six==1.15.0 \
-                                 pyOpenSSL==20.0.1 && \
-
-         #pytest extra
-         pip install pytest==6.1.2 mock==4.0.2 pytest-assume==2.3.3 pytest-mock==3.3.1 \
-                     attrs==20.2.0 py==1.9.0 PyYAML==5.1 toml==0.10.2 pluggy==0.13.1 packaging==20.4 iniconfig==1.1.1 \
-                     pyparsing==2.4.7 requests==2.24.0 tqdm==4.59.0 && \
-
+         pip install fabric==2.5.0 invoke==1.7.3 paramiko==2.7.2 PyNaCl==1.3.0  bcrypt==3.2.0 \
+                     cffi==1.14.5 cryptography==41.0.3 pycparser==2.20 PyNaCl==1.3.0 six==1.16.0 \
+                                 pyOpenSSL==20.0.1 \
+          \
          #twine
-     #https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
-     #Add Python 3.8 support
-     #see https://github.com/pypa/twine/pull/518
-     pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.3 rfc3986==1.4.0 readme-renderer==28.0  \
-                                                                          requests-toolbelt==0.9.1  && \
-     #SQLAlchemy & Hive & Postgress
-         pip install SQLAlchemy==1.4.11 thrift==0.13.0 thrift-sasl==0.4.2 sasl==0.2.1 PyHive==0.6.2 pg8000==1.19.3 \
+         #https://twine.readthedocs.io/en/latest/changelog.html see 3.0.0 changelog
+         #Add Python 3.8 support
+         #see https://github.com/pypa/twine/pull/518
+         pip install twine==3.2.0 pkginfo==1.6.1 colorama==0.4.4 rfc3986==1.4.0 readme-renderer==28.0  \
+                                                                              requests-toolbelt==0.9.1  && \
+         #SQLAlchemy & Hive & Postgress
+         pip install SQLAlchemy==1.4.31 thrift==0.13.0 thrift-sasl==0.4.2 sasl==0.2.1 PyHive==0.6.2 pg8000==1.29.4 \
                      pure-sasl==0.6.2 pure-transport==0.2.0 future==0.18.2
 
 
@@ -197,10 +207,10 @@ RUN set -ex && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 #RUN apk del glibc-i18n make gcc musl-dev build-base gfortran
 RUN rm -rf /var/cache/apk/*
 
-COPY enter_keyring.sh /etc/enter_keyring.sh
-COPY reuse_keyring.sh /etc/reuse_keyring.sh
-COPY unlock_keyring.sh /etc/unlock_keyring.sh
-COPY rest_keyring.sh /etc/rest_keyring.sh
+#COPY enter_keyring.sh /etc/enter_keyring.sh
+#COPY reuse_keyring.sh /etc/reuse_keyring.sh
+#COPY unlock_keyring.sh /etc/unlock_keyring.sh
+#COPY rest_keyring.sh /etc/rest_keyring.sh
 
 
 WORKDIR /
@@ -239,7 +249,8 @@ CMD tail -f /dev/null
 #docker commit --change "CMD /bin/sh" --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin: \
 #    ARCH=amd64 \
 #    PYTHONUNBUFFERED=1 \
-#    LANG=C.UTF-8" \
+#    LANG=C.UTF-8 \
+#    PIP_ROOT_USER_ACTION=ignore" \
 #    $(docker ps -q -n=1) alpine-python3-amd64-ef
 
 #docker run --name py3-arm64v8 -d alpine-python3-arm64v8
@@ -251,21 +262,22 @@ CMD tail -f /dev/null
 #docker commit --change "CMD /bin/sh" --change "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin: \
 #    ARCH=arm64v8 \
 #    PYTHONUNBUFFERED=1 \
-#    LANG=C.UTF-8" \
+#    LANG=C.UTF-8 \
+#    PIP_ROOT_USER_ACTION=ignore" \
 #    $(docker ps -q -n=1)  alpine-python3-arm64v8-ef
 
 
-#docker tag alpine-python3-amd64-ef alexberkovich/alpine-python3:0.3.3-amd64
-#docker tag alpine-python3-arm64v8-ef alexberkovich/alpine-python3:0.3.3-arm64v8
-#docker push alexberkovich/alpine-python3:0.3.3-amd64
-#docker push alexberkovich/alpine-python3:0.3.3-arm64v8
-#docker manifest create alexberkovich/alpine-python3:0.3.3 --amend alexberkovich/alpine-python3:0.3.3-arm64v8 --amend alexberkovich/alpine-python3:0.3.3-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-python3:0.3.3 alexberkovich/alpine-python3:0.3.3-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-python3:0.3.3 alexberkovich/alpine-python3:0.3.3-amd64
-#docker manifest push --purge alexberkovich/alpine-python3:0.3.3
+#docker tag alpine-python3-amd64-ef alexberkovich/alpine-python3:0.3.4-amd64
+#docker tag alpine-python3-arm64v8-ef alexberkovich/alpine-python3:0.3.4-arm64v8
+#docker push alexberkovich/alpine-python3:0.3.4-amd64
+#docker push alexberkovich/alpine-python3:0.3.4-arm64v8
+#docker manifest create alexberkovich/alpine-python3:0.3.4 --amend alexberkovich/alpine-python3:0.3.4-arm64v8 --amend alexberkovich/alpine-python3:0.3.4-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-python3:0.3.4 alexberkovich/alpine-python3:0.3.4-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-python3:0.3.4 alexberkovich/alpine-python3:0.3.4-amd64
+#docker manifest push --purge alexberkovich/alpine-python3:0.3.4
 
-#docker manifest create alexberkovich/alpine-python3:latest --amend alexberkovich/alpine-python3:0.3.3-arm64v8 --amend alexberkovich/alpine-python3:0.3.3-amd64
-#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-python3:latest alexberkovich/alpine-python3:0.3.3-arm64v8
-#docker manifest annotate --arch amd64 alexberkovich/alpine-python3:latest alexberkovich/alpine-python3:0.3.3-amd64
+#docker manifest create alexberkovich/alpine-python3:latest --amend alexberkovich/alpine-python3:0.3.4-arm64v8 --amend alexberkovich/alpine-python3:0.3.4-amd64
+#docker manifest annotate --arch arm64 --variant v8 alexberkovich/alpine-python3:latest alexberkovich/alpine-python3:0.3.4-arm64v8
+#docker manifest annotate --arch amd64 alexberkovich/alpine-python3:latest alexberkovich/alpine-python3:0.3.4-amd64
 #docker manifest push --purge alexberkovich/alpine-python3:latest
 # EOF
