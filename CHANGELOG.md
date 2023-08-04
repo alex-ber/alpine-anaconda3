@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+##[0.3.5] - 04/08/2023
+### Changed
+- Upgrade pyOpenSSL from 20.0.1 to 22.1.0. There is strong dependency between pyOpenSSL and cryptography, they should 
+change in sync. pyOpenSSL==22.1.0 this is the lowest version that has cryptography as pinned version.
+This is the reason for downgrade of cryptography. The build of pyOpenSSL==20.0.1 and cryptography==41.0.3
+stop to work for some weired reason (my guess is because of change of Rust building chain).
+- Downgrade cryptography from 41.0.3 to 38.0.4.
 
 ##[0.3.4] - 04/08/2023
 ### Added
